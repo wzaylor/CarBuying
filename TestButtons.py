@@ -1,14 +1,10 @@
-from __future__ import unicode_literals
 import sys
-import os
-import random
 import numpy as np
-from matplotlib.backends import qt4_compat
-use_pyside = qt4_compat.QT_API == qt4_compat.QT_API_PYSIDE
-if use_pyside:
-    from PySide import QtGui, QtCore
-else:
-    from PyQt4 import QtGui, QtCore
+
+from PyQt4 import QtGui, QtCore
+
+# Custom modules/functions
+import CarBuyingBackend as backend
 
 class ApplicationWindow(QtGui.QMainWindow):
     def __init__(self):
