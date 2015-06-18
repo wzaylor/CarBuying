@@ -1,0 +1,47 @@
+(dp1
+S'2012'
+p2
+(dp3
+VHatchback 4D 
+p4
+(dp5
+S'price'
+p6
+F11137
+sS'priceMax'
+p7
+F11876
+sS'priceMin'
+p8
+F10397
+sssS'2011'
+p9
+(dp10
+VHatchback 4D 
+p11
+(dp12
+g6
+F11141
+sg7
+F11843
+sg8
+F10438
+sssS'2013'
+p13
+(dp14
+VHatchback 4D 
+p15
+(dp16
+g6
+F11448
+sg7
+F12252
+sg8
+F10643
+sssS'years'
+p17
+(lp18
+g9
+ag2
+ag13
+as.
