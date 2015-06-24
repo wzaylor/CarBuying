@@ -33,23 +33,32 @@ class ApplicationWindow(QtGui.QMainWindow):
         self.setCentralWidget(self.main_widget)
 
     def _populateTabSelectionTree(self):
-        data = getTestData()
-        for heading in data.keys():
+        data = backend.getCarMakes()
+        for heading in data:
             CustomTreeItem(heading, callbackSlot = self.addRemoveTab, parent = self.addTabsDialog.treeWidget)
         return
+
+    def _populateTabTree(self, tabName):
+        tabIndex = self.tabBar.findTabIndex(tabName)
+        if tabIndex != None:
+            tabItem = self.tabBar.findTabItem(tabIndex)
+            tabItem.data = backend.getMakeData(tabName)
+            fill_widget(tabItem, tabItem.data.data)
+            #x = tabItem.data
+            #for model in tabItem.data.data.keys():
+            #    CustomTreeItem(model, callbackSlot = self.testCallback, parent = tabItem)
+        return
         
+    # Callback function which is used to add tabs to the tab bar
     @QtCore.pyqtSlot(str, int)
     def addRemoveTab(self, tabName, isChecked):
         if isChecked == True:
             self.tabBar.AddNewTab(tabName)
-            tabIndex = self.tabBar.findTabIndex(tabName)
-            if tabIndex != None:
-                CustomTreeItem(tabName, callbackSlot = self.testCallback, parent = self.tabBar.widget(tabIndex))
+            self._populateTabTree(tabName)
         else:
             tabIndex = self.tabBar.findTabIndex(tabName)
             if tabIndex != None:
                 self.tabBar.removeTab(tabIndex)
-
         return
 
     @QtCore.pyqtSlot(str, int)
@@ -57,6 +66,7 @@ class ApplicationWindow(QtGui.QMainWindow):
         print i, checked
         return
 
+    # Callback which is used to open the add tabs dialog box
     @QtCore.pyqtSlot()
     def openAddTabsDialog(self):
         self.addTabsDialog.show()
@@ -69,6 +79,7 @@ class TabBarUI(QtGui.QTabWidget):
     def AddNewTab(self, tabName, callbackSlot = None):
         self.newTree = CheckBoxUI(name = tabName)
         self.addTab(self.newTree, tabName)
+        self.data = None
         return
 
     def findTabIndex(self, tabName):
@@ -84,6 +95,10 @@ class TabBarUI(QtGui.QTabWidget):
                 index = None
             index += 1
         return index
+
+    def findTabItem(self, tabIndex):
+        tabItem = self.widget(tabIndex)
+        return tabItem
 
 class addTabBtn(QtGui.QPushButton):
     BtnSignal = QtCore.pyqtSignal()
@@ -179,8 +194,35 @@ class CustomTreeItem(QtGui.QTreeWidgetItem):
         self.treeWidget().TreeItemSignal.disconnect()
         return
 
-def getNextDataKeys(currentKey):
-    return
+def fill_item(item, value):
+    item.setExpanded(False)
+    if type(value) is dict:
+        for key, val in sorted(value.iteritems()):
+            child = QtGui.QTreeWidgetItem()
+            child.setText(0, unicode(key))
+            item.addChild(child)
+            fill_item(child, val)
+    elif type(value) is list:
+        for val in value:
+            child = QtGui.QTreeWidgetItem()
+            item.addChild(child)
+            if type(val) is dict:      
+                child.setText(0, '[dict]')
+                fill_item(child, val)
+            elif type(val) is list:
+                child.setText(0, '[list]')
+                fill_item(child, val)
+        else:
+            child.setText(0, unicode(val))              
+            child.setExpanded(True)
+    else:
+        child = QtGui.QTreeWidgetItem()
+        child.setText(0, unicode(value))
+        item.addChild(child)
+
+def fill_widget(widget, value):
+    widget.clear()
+    fill_item(widget.invisibleRootItem(), value)
 
 class testClass(object):
     value = 5
