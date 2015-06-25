@@ -43,7 +43,7 @@ class ApplicationWindow(QtGui.QMainWindow):
         if tabIndex != None:
             tabItem = self.tabBar.findTabItem(tabIndex)
             tabItem.data = backend.getMakeData(tabName)
-            fill_widget(tabItem, tabItem.data.data)
+            self.fillWidget(tabItem, tabItem.data.data)
             #x = tabItem.data
             #for model in tabItem.data.data.keys():
             #    CustomTreeItem(model, callbackSlot = self.testCallback, parent = tabItem)
@@ -71,6 +71,35 @@ class ApplicationWindow(QtGui.QMainWindow):
     def openAddTabsDialog(self):
         self.addTabsDialog.show()
         return
+
+    def fillItem(self, item, value):
+        item.setExpanded(False)
+        if type(value) is dict and 'price' not in value.keys():
+            for key, val in sorted(value.iteritems()):
+                child = QtGui.QTreeWidgetItem()
+                child.setText(0, unicode(key))
+                item.addChild(child)
+                self.fillItem(child, val)
+        elif type(value) is list:
+            for val in value:
+                child = QtGui.QTreeWidgetItem()
+                item.addChild(child)
+                if type(val) is dict:      
+                    child.setText(0, '[dict]')
+                    self.fillItem(child, val)
+                elif type(val) is list:
+                    child.setText(0, '[list]')
+                    self.fillItem(child, val)
+            else:
+                child.setText(0, unicode(val))              
+                child.setExpanded(True)
+        elif 'price' in value.keys():
+            child = CustomTreeItem("testName!", parent = item)
+            item.addChild(child)
+
+    def fillWidget(self, widget, value):
+        widget.clear()
+        self.fillItem(widget.invisibleRootItem(), value)
 
 class TabBarUI(QtGui.QTabWidget):
     def __init__(self, parent=None):
@@ -194,64 +223,11 @@ class CustomTreeItem(QtGui.QTreeWidgetItem):
         self.treeWidget().TreeItemSignal.disconnect()
         return
 
-def fill_item(item, value):
-    item.setExpanded(False)
-    if type(value) is dict:
-        for key, val in sorted(value.iteritems()):
-            child = QtGui.QTreeWidgetItem()
-            child.setText(0, unicode(key))
-            item.addChild(child)
-            fill_item(child, val)
-    elif type(value) is list:
-        for val in value:
-            child = QtGui.QTreeWidgetItem()
-            item.addChild(child)
-            if type(val) is dict:      
-                child.setText(0, '[dict]')
-                fill_item(child, val)
-            elif type(val) is list:
-                child.setText(0, '[list]')
-                fill_item(child, val)
-        else:
-            child.setText(0, unicode(val))              
-            child.setExpanded(True)
-    else:
-        child = QtGui.QTreeWidgetItem()
-        child.setText(0, unicode(value))
-        item.addChild(child)
-
-def fill_widget(widget, value):
-    widget.clear()
-    fill_item(widget.invisibleRootItem(), value)
-
 class testClass(object):
     value = 5
     def callback(self):
         print 'testClass callback'
         return
-
-def getTestData():
-    data = {}
-    data['heading1a'] = {}
-    data['heading1a']['subheading2a'] = {}
-    data['heading1a']['subheading2a']['subheading3a'] = {}
-    data['heading1a']['subheading2a']['subheading3a']['subheading4a'] = {}
-    data['heading1a']['subheading2a']['subheading3a']['subheading4a']['DX'] = np.random.rand(10,2)
-    data['heading1a']['subheading2a']['subheading3a']['subheading4a']['LS'] = np.random.rand(10,2)
-
-    data['heading1a']['subheading2a']['subheading3b'] = {}
-    data['heading1a']['subheading2a']['subheading3b']['subheading4a'] = {}
-    data['heading1a']['subheading2a']['subheading3b']['subheading4a']['DX'] = np.random.rand(10,2)
-    data['heading1a']['subheading2a']['subheading3b']['subheading4a']['LS'] = np.random.rand(10,2)
-
-    data['heading1b'] = {}
-    data['heading1b']['subheading2b'] = {}
-    data['heading1b']['subheading2b']['subheading3c'] = {}
-    data['heading1b']['subheading2b']['subheading3c']['subheading4a'] = {}
-    data['heading1b']['subheading2b']['subheading3c']['subheading4a']['CE'] = np.random.rand(10,2)
-    data['heading1b']['subheading2b']['subheading3c']['subheading4a']['MQ'] = np.random.rand(10,2)
-
-    return data
 
 if __name__ == '__main__':
     qApp = QtGui.QApplication(sys.argv)
