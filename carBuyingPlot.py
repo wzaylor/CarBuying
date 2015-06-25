@@ -1,10 +1,12 @@
 import matplotlib.pyplot as plt
 from matplotlib.backends import qt4_compat
-#use_pyside = qt4_compat.QT_API == qt4_compat.QT_API_PYSIDE
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
 import cPickle
 from PyQt4 import QtGui, QtCore
+
+# Custom modules/functions
+import CarBuyingBackend as backend
 
 class MyMplCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
@@ -28,8 +30,8 @@ class carBuyingPlot(MyMplCanvas):
         self.name = name
         self.curves = {}
 
-    def addCurve(self, min, max, avg, name = None):
-        self.curves[name] = Curve(min, max, avg, self.ax)
+    def addCurve(self, min, max, avg, name = None, color = 'b'):
+        self.curves[name] = Curve(min, max, avg, self.ax, color = color)
         return
 
     def addLegend(self):
@@ -38,7 +40,7 @@ class carBuyingPlot(MyMplCanvas):
         for label in self.curves.keys():
             lines.append(self.curves[label].avg)
             labels.append(label)
-        self.legend = self.fig.legend(lines, labels, 'upper left')
+        self.legend = self.fig.legend(lines, labels, 'upper right')
         return
 
 class Curve(object):
@@ -51,13 +53,14 @@ class Curve(object):
         self.setAlpha(alpha)
         
     def getBounds(self, min, max, ax):
-        x_values = range(10)#min[:,0]
-        bounds = plt.fill_between(x_values, min, max, axes = ax)
+        x_values = min[:,0]
+        bounds = plt.fill_between(x_values, min[:,1], max[:,1], axes = ax)
         return bounds
 
     def getAvg(self, avg, ax, label):
-        x_values = range(10)#min[:,0]
-        avgPlot, = plt.plot(x_values, avg, axes = ax)
+        x_values = avg[:,0]
+        #avgPlot = plt.Line2D(x_values, avg[:,1], axes = ax, linewidth = 2)
+        avgPlot, = plt.plot(x_values, avg[:,1], axes = ax)
         return avgPlot
 
     def setColor(self, color):
@@ -72,22 +75,35 @@ class Curve(object):
         return
 
     def updateValues(self, min, max, avg, ax):
-        x_values = range(10)
-        self.bounds = plt.fill_between(x_values, min, max, axes = ax, alpha = self._alpha, color = self._color)
+        x_values = min[:,0]
+        self.bounds = plt.fill_between(x_values, min[:,1], max[:,1], axes = ax, alpha = self._alpha, color = self._color)
         return
 
     def setLabel(self, label):
         self.avg.set_label(label)
         return
 
+def getTestData(year = '2011'):
+    data = backend.getMakeData('Toyota')
+    return data.data['Prius'][year]['One Hatchback 4D ']
+
+def testAddData(years, plot, colors = ['r', 'g', 'b']):
+    for i, year in enumerate(years):
+        data = getTestData(year = str(year))
+
+        min = data['priceMin']
+        max = data['priceMax']
+        avg = data['price']
+        plot.addCurve(min, max, avg, name = str(year), color = colors[i])
+
+    plot.addLegend()
+    return
+
 if __name__ == '__main__':
     import numpy as np
 
-    min = np.linspace(0,10,10)
-    avg = np.linspace(0,10,10) + 3
-    max = np.linspace(0,10,10) + 5
-
-    x = carBuyingPlot()
-    x.addCurve(min, max, avg, name = 'testname')
-    x.addLegend()
+    plot = carBuyingPlot()
+    years = [2011, 2013]#, 2013]
+    
+    testAddData(years, plot)
     plt.show()
