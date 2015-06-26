@@ -74,12 +74,17 @@ class ApplicationWindow(QtGui.QMainWindow):
 
     def fillItem(self, item, value):
         item.setExpanded(False)
-        if type(value) is dict and 'price' not in value.keys():
+        if type(value) is dict:# and 'price' not in value.keys():
             for key, val in sorted(value.iteritems()):
-                child = QtGui.QTreeWidgetItem()
-                child.setText(0, unicode(key))
-                item.addChild(child)
-                self.fillItem(child, val)
+                if type(val) is dict:
+                    if 'price' in val.keys():
+                        child = CustomTreeItem(key, parent = item)
+                        item.addChild(child)
+                    else:
+                        child = QtGui.QTreeWidgetItem()
+                        child.setText(0, unicode(key))
+                        item.addChild(child)
+                        self.fillItem(child, val)
         elif type(value) is list:
             for val in value:
                 child = QtGui.QTreeWidgetItem()
@@ -93,9 +98,9 @@ class ApplicationWindow(QtGui.QMainWindow):
             else:
                 child.setText(0, unicode(val))              
                 child.setExpanded(True)
-        elif 'price' in value.keys():
-            child = CustomTreeItem("testName!", parent = item)
-            item.addChild(child)
+        #elif 'price' in value.keys():
+        #    child = CustomTreeItem("testName!", parent = item)
+        #    item.addChild(child)
 
     def fillWidget(self, widget, value):
         widget.clear()
