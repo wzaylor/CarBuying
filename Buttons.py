@@ -61,7 +61,7 @@ class ButtonWindow(QtGui.QMainWindow):
                 self.tabBar.removeTab(tabIndex)
         return
 
-    @QtCore.pyqtSlot(str, int)
+    @QtCore.pyqtSlot(dict, int)
     def testCallback(self, i, checked):
         print i, checked
         return
@@ -168,7 +168,7 @@ class CheckBoxUI(QtGui.QTreeWidget):
     TreeDataSignal = QtCore.pyqtSignal(dict, int)
     TreeUncheckSignal = QtCore.pyqtSignal()
 
-    def __init__( self, name = None, callbackSlot = None, parent=None ):
+    def __init__(self, name = None, callbackSlot = None, parent=None):
  
         ## Init:
         super(CheckBoxUI, self).__init__(parent)
@@ -185,7 +185,7 @@ class CustomTreeItem(QtGui.QTreeWidgetItem):
     '''
     Custom QTreeWidgetItem with Widgets
     '''
-    def __init__(self, name, callbackSlot = None, data = None, parent = None):
+    def __init__(self, name, callbackSlot = None, uncheckCallback = None, data = None, parent = None):
         '''
         parent (QTreeWidget) : Item's QTreeWidget parent.
         name   (str)         : Item's name. just an example.
@@ -223,12 +223,14 @@ class CustomTreeItem(QtGui.QTreeWidgetItem):
 
     def _genericCallback(self):
         checked = self.checkBox.isChecked()
-        self.treeWidget().TreeItemSignal.connect(self.emitCallback)
         if self.data != None:
-           self.treeWidget().TreeDataSignal.emit(self.data, checked)
+            self.treeWidget().TreeDataSignal.connect(self.emitCallback)
+            self.treeWidget().TreeDataSignal.emit(self.data, checked)
+            self.treeWidget().TreeDataSignal.disconnect()
         else:
+            self.treeWidget().TreeItemSignal.connect(self.emitCallback)
             self.treeWidget().TreeItemSignal.emit(self.name, checked)
-        self.treeWidget().TreeItemSignal.disconnect()
+            self.treeWidget().TreeItemSignal.disconnect()
         return
 
 class testClass(object):
