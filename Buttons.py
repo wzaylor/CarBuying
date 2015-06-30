@@ -6,9 +6,10 @@ from PyQt4 import QtGui, QtCore
 # Custom modules/functions
 import CarBuyingBackend as backend
 
-class ApplicationWindow(QtGui.QMainWindow):
-    def __init__(self):
-        QtGui.QMainWindow.__init__(self)
+class ButtonWindow(QtGui.QMainWindow):
+    def __init__(self, outsideCallback = None, parent = None):
+        #QtGui.QMainWindow.__init__(self)
+        super(ButtonWindow, self).__init__(parent)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setWindowTitle("application main window")
 
@@ -19,6 +20,8 @@ class ApplicationWindow(QtGui.QMainWindow):
         self.testClass = testClass()
 
         self.tabBar = TabBarUI(parent = self)
+
+        self.outsideCallback = outsideCallback
 
         self.addTabsDialog = addTabsDialogUI(parent = self)
         self._populateTabSelectionTree()
@@ -42,11 +45,8 @@ class ApplicationWindow(QtGui.QMainWindow):
         tabIndex = self.tabBar.findTabIndex(tabName)
         if tabIndex != None:
             tabItem = self.tabBar.findTabItem(tabIndex)
-            tabItem.data = backend.getMakeData(tabName)
-            self.fillWidget(tabItem, tabItem.data.data)
-            #x = tabItem.data
-            #for model in tabItem.data.data.keys():
-            #    CustomTreeItem(model, callbackSlot = self.testCallback, parent = tabItem)
+            data = backend.getMakeData(tabName)
+            self.fillWidget(tabItem, data.data)
         return
         
     # Callback function which is used to add tabs to the tab bar
@@ -74,11 +74,11 @@ class ApplicationWindow(QtGui.QMainWindow):
 
     def fillItem(self, item, value):
         item.setExpanded(False)
-        if type(value) is dict:# and 'price' not in value.keys():
+        if type(value) is dict:
             for key, val in sorted(value.iteritems()):
                 if type(val) is dict:
                     if 'price' in val.keys():
-                        child = CustomTreeItem(key, parent = item)
+                        child = CustomTreeItem(key, parent = item, callbackSlot = self.outsideCallback, data = val)
                         item.addChild(child)
                     else:
                         child = QtGui.QTreeWidgetItem()
@@ -98,12 +98,10 @@ class ApplicationWindow(QtGui.QMainWindow):
             else:
                 child.setText(0, unicode(val))              
                 child.setExpanded(True)
-        #elif 'price' in value.keys():
-        #    child = CustomTreeItem("testName!", parent = item)
-        #    item.addChild(child)
+        return
 
     def fillWidget(self, widget, value):
-        widget.clear()
+        #widget.clear()
         self.fillItem(widget.invisibleRootItem(), value)
 
 class TabBarUI(QtGui.QTabWidget):
@@ -167,6 +165,7 @@ class addTabsDialogUI(QtGui.QDialog):
 
 class CheckBoxUI(QtGui.QTreeWidget):
     TreeItemSignal = QtCore.pyqtSignal(str, int)
+    TreeDataSignal = QtCore.pyqtSignal(dict, int)
     TreeUncheckSignal = QtCore.pyqtSignal()
 
     def __init__( self, name = None, callbackSlot = None, parent=None ):
@@ -186,7 +185,7 @@ class CustomTreeItem(QtGui.QTreeWidgetItem):
     '''
     Custom QTreeWidgetItem with Widgets
     '''
-    def __init__(self, name, callbackSlot = None, parent = None):
+    def __init__(self, name, callbackSlot = None, data = None, parent = None):
         '''
         parent (QTreeWidget) : Item's QTreeWidget parent.
         name   (str)         : Item's name. just an example.
@@ -198,6 +197,7 @@ class CustomTreeItem(QtGui.QTreeWidgetItem):
         self.treeWidget().setColumnCount(2)
 
         self.name = name
+        self.data = data
 
         ## Column 0 - Text:
         self.setText(0, self.name)
@@ -224,7 +224,10 @@ class CustomTreeItem(QtGui.QTreeWidgetItem):
     def _genericCallback(self):
         checked = self.checkBox.isChecked()
         self.treeWidget().TreeItemSignal.connect(self.emitCallback)
-        self.treeWidget().TreeItemSignal.emit(self.name, checked)
+        if self.data != None:
+           self.treeWidget().TreeDataSignal.emit(self.data, checked)
+        else:
+            self.treeWidget().TreeItemSignal.emit(self.name, checked)
         self.treeWidget().TreeItemSignal.disconnect()
         return
 
@@ -236,6 +239,6 @@ class testClass(object):
 
 if __name__ == '__main__':
     qApp = QtGui.QApplication(sys.argv)
-    aw = ApplicationWindow()
+    aw = ButtonWindow()
     aw.show()
     sys.exit(qApp.exec_())
