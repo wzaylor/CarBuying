@@ -32,7 +32,6 @@ class ApplicationWindow(QtGui.QMainWindow):
         self.statusBar().showMessage("All hail matplotlib!", 2000)
 
     def _initialize(self):
-        #self.addCarBtn = self._addCarButton()
         self.makeTabs = TabBarUI(parent = self)
         self._buttons()
         return
@@ -68,9 +67,8 @@ class ApplicationWindow(QtGui.QMainWindow):
 
     @QtCore.pyqtSlot(dict, int)
     def testcallback(self, d, i):
-        print 'here!!!!!!!!!!!!!!11111111'
-        print d.keys()
-        print i
+        self.testPlot.addCurve(d['priceMin'], d['priceMax'], d['price'])
+        print 'Curve added!'
         return
 
 class TabBarUI(QtGui.QTabWidget):
