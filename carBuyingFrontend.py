@@ -65,10 +65,13 @@ class ApplicationWindow(QtGui.QMainWindow):
         self.fileQuit()
         return
 
-    @QtCore.pyqtSlot(dict, int)
-    def testcallback(self, d, i):
-        self.testPlot.addCurve(d['priceMin'], d['priceMax'], d['price'])
-        print 'Curve added!'
+    @QtCore.pyqtSlot(dict, int, str)
+    def testcallback(self, data, checked, name):
+        if checked == True:
+            self.testPlot.addCurve(data['priceMin'], data['priceMax'], data['price'], name = name)
+            self.testPlot.draw()
+        else:
+            del self.testPlot.curves[name]
         return
 
 class TabBarUI(QtGui.QTabWidget):
