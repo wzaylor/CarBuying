@@ -165,7 +165,7 @@ class addTabsDialogUI(QtGui.QDialog):
 
 class CheckBoxUI(QtGui.QTreeWidget):
     TreeItemSignal = QtCore.pyqtSignal(str, int)
-    TreeDataSignal = QtCore.pyqtSignal(dict, int)
+    TreeDataSignal = QtCore.pyqtSignal(dict, int, str)
     TreeUncheckSignal = QtCore.pyqtSignal()
 
     def __init__(self, name = None, callbackSlot = None, parent=None):
@@ -225,7 +225,7 @@ class CustomTreeItem(QtGui.QTreeWidgetItem):
         checked = self.checkBox.isChecked()
         if self.data != None:
             self.treeWidget().TreeDataSignal.connect(self.emitCallback)
-            self.treeWidget().TreeDataSignal.emit(self.data, checked)
+            self.treeWidget().TreeDataSignal.emit(self.data, checked, self.name)
             self.treeWidget().TreeDataSignal.disconnect()
         else:
             self.treeWidget().TreeItemSignal.connect(self.emitCallback)
