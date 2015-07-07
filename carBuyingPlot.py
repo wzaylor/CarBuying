@@ -25,6 +25,7 @@ class MyMplCanvas(FigureCanvas):
 
         self.ax.set_xlabel('Mileage')
         self.ax.set_ylabel('Price')
+        self.ax.grid()
 
 class carBuyingPlot(MyMplCanvas):
     def __init__(self, name = 'Name', parent = None):
