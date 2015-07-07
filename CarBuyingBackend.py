@@ -1,11 +1,11 @@
 import cPickle
 from os import listdir
 
-def getCarMakes(dir = 'C:\\Projects\\Car_makes'):
+def getCarMakes(dir = 'C:\\Projects\\CarBuying\\Car_makes'):
     makes = listdir(dir)
     return makes
 
-def getCarModels(carMake, dir = 'C:\\Projects\\Car_makes', fileNames = False):
+def getCarModels(carMake, dir = 'C:\\Projects\\CarBuying\\Car_makes', fileNames = False):
     folder = dir + '\\' + carMake
     models = listdir(folder)
     for i in range(len(models)):
@@ -16,7 +16,7 @@ def getCarModels(carMake, dir = 'C:\\Projects\\Car_makes', fileNames = False):
     return models
 
 class getMakeData(object):
-    def __init__(self, carMake, dir = 'C:\\Projects\\Car_makes'):
+    def __init__(self, carMake, dir = 'C:\\Projects\\CarBuying\\Car_makes'):
         self.data = {}
         self.makeFolder = dir + '\\' + carMake
         self.getData()
