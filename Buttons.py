@@ -134,7 +134,7 @@ class TabBarUI(QtGui.QTabWidget):
 
 class addTabBtn(QtGui.QPushButton):
     BtnSignal = QtCore.pyqtSignal()
-    def __init__(self, text = 'text', parent = None):
+    def __init__(self, text = 'Car makes', parent = None):
         super(addTabBtn, self).__init__(parent)
         self.setText(text)
 
