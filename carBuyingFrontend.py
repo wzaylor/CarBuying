@@ -71,7 +71,11 @@ class ApplicationWindow(QtGui.QMainWindow):
             self.testPlot.addCurve(data['priceMin'], data['priceMax'], data['price'], name = name)
             self.testPlot.draw()
         else:
+            print 'name = ', name
+            self.testPlot.curves[name].bounds.remove()
+            self.testPlot.curves[name].avg.remove()
             del self.testPlot.curves[name]
+            self.testPlot.draw()
         return
 
 class TabBarUI(QtGui.QTabWidget):
