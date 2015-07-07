@@ -4,6 +4,7 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
 import cPickle
 from PyQt4 import QtGui, QtCore
+import numpy as np
 
 # Custom modules/functions
 import CarBuyingBackend as backend
@@ -51,6 +52,7 @@ class Curve(object):
         self.bounds = self.getBounds(min, max, ax)
         self.avg = self.getAvg(avg, ax, label)
         self.bounds.set_alpha(0.2)
+        color = np.random.rand(3)
         self.setColor(color)
         self.setLabel(label)
         self.setAlpha(alpha)
