@@ -78,7 +78,8 @@ class ButtonWindow(QtGui.QMainWindow):
             for key, val in sorted(value.iteritems()):
                 if type(val) is dict:
                     if 'price' in val.keys():
-                        child = CustomTreeItem(key, parent = item, callbackSlot = self.outsideCallback, data = val)
+                        name = key + str(np.round(np.random.rand(), 2))
+                        child = CustomTreeItem(name, parent = item, callbackSlot = self.outsideCallback, data = val)
                         item.addChild(child)
                     else:
                         child = QtGui.QTreeWidgetItem()
