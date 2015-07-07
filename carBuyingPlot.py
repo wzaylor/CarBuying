@@ -14,7 +14,6 @@ class MyMplCanvas(FigureCanvas):
         self.fig = plt.Figure(figsize=(width, height), dpi=dpi)
         self.ax = self.fig.add_subplot(111)
         # We want the axes cleared every time plot() is called
-        self.ax.hold(False)
 
         FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
@@ -24,10 +23,13 @@ class MyMplCanvas(FigureCanvas):
                                    QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
 
+        self.ax.set_xlabel('Mileage')
+        self.ax.set_ylabel('Price')
+
 class carBuyingPlot(MyMplCanvas):
     def __init__(self, name = 'Name', parent = None):
         super(carBuyingPlot, self).__init__(parent=parent)
-        self.name = name
+        self.name = str(name)
         self.curves = {}
 
     def addCurve(self, min, max, avg, name = None, color = 'b'):
@@ -54,13 +56,12 @@ class Curve(object):
         
     def getBounds(self, min, max, ax):
         x_values = min[:,0]
-        bounds = plt.fill_between(x_values, min[:,1], max[:,1], axes = ax)
+        bounds = ax.fill_between(x_values, min[:,1], max[:,1], axes = ax)
         return bounds
 
     def getAvg(self, avg, ax, label):
         x_values = avg[:,0]
-        #avgPlot = plt.Line2D(x_values, avg[:,1], axes = ax, linewidth = 2)
-        avgPlot, = plt.plot(x_values, avg[:,1], axes = ax)
+        avgPlot, = ax.plot(x_values, avg[:,1])
         return avgPlot
 
     def setColor(self, color):
@@ -76,7 +77,7 @@ class Curve(object):
 
     def updateValues(self, min, max, avg, ax):
         x_values = min[:,0]
-        self.bounds = plt.fill_between(x_values, min[:,1], max[:,1], axes = ax, alpha = self._alpha, color = self._color)
+        self.bounds = ax.fill_between(x_values, min[:,1], max[:,1], axes = ax, alpha = self._alpha, color = self._color)
         return
 
     def setLabel(self, label):
@@ -106,4 +107,5 @@ if __name__ == '__main__':
     years = [2011, 2013]#, 2013]
     
     testAddData(years, plot)
+    plot.show()
     plt.show()
