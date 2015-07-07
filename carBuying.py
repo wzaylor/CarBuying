@@ -35,7 +35,7 @@ class CarModel(object):
     def getYearKBB(self, makeURL, years):
         modelURL = makeURL + '/' + self.name
         html = fetch(modelURL, cookies=self.cookies)
-        self.data['years'] = years
+        #self.data['years'] = years
         for year in years:
             for link in html.find_all('a', class_='section-title'):
                 if year in link.attrs['href']:
@@ -75,7 +75,6 @@ class CarModel(object):
                 print '***************************'
                 print year, style, mileage
                 print priceMin, price, priceMax
-            break
             
         return
 
@@ -144,11 +143,21 @@ def pause():
     time.sleep(1)
     return
 
-if __name__ == '__main__':
+def main():
     cookies = {'ZipCode': '44146'}
     urls = ['http://www.kbb.com']
-    #honda = CarMake('Honda', urls = urls, cookies = cookies)
-    x = CarModel('Civic', 'http://www.kbb.com/honda/', cookies = cookies)
+    make = 'Hyundai'
+    model = 'Elantra'
+    
+    url = 'http://www.kbb.com/' + make + '/'
+    saveFile = 'C:\\Projects\\CarBuying\\Car_makes\\' + make + '\\' + model + '.dat'
 
-    with open('Civic.dat', mode = 'w') as file:
+    x = CarModel('Accent', url, cookies = cookies, years = ['2008', '2009', '2010', '2011', '2012', '2013'])
+    #x = CarModel('Civic', 'http://www.kbb.com/honda/', cookies = cookies)
+
+    with open(saveFile, mode = 'w') as file:
         cPickle.dump(x.data, file)
+    return
+
+if __name__ == '__main__':
+    main()
