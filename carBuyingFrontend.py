@@ -69,12 +69,15 @@ class ApplicationWindow(QtGui.QMainWindow):
     def testcallback(self, data, checked, name):
         if checked == True:
             self.testPlot.addCurve(data['priceMin'], data['priceMax'], data['price'], name = name)
+            self.testPlot.addLegend()
             self.testPlot.draw()
         else:
             print 'name = ', name
             self.testPlot.curves[name].bounds.remove()
             self.testPlot.curves[name].avg.remove()
             del self.testPlot.curves[name]
+            self.testPlot.legend.remove()
+            self.testPlot.addLegend()
             self.testPlot.draw()
         return
 
