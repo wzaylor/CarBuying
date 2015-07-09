@@ -26,6 +26,8 @@ class MyMplCanvas(FigureCanvas):
 
         self.ax.set_xlabel('Mileage')
         self.ax.set_ylabel('Price')
+        self.ax.set_xlim([30000, 90000])
+        self.ax.set_ylim([3000, 15000])
         self.ax.grid()
 
 class carBuyingPlot(MyMplCanvas):
