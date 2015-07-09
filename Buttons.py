@@ -46,7 +46,7 @@ class ButtonWindow(QtGui.QMainWindow):
         if tabIndex != None:
             tabItem = self.tabBar.findTabItem(tabIndex)
             data = backend.getMakeData(tabName)
-            self.fillWidget(tabItem, data.data)
+            self.fillWidget(tabItem, data.data, tabName)
         return
         
     # Callback function which is used to add tabs to the tab bar
@@ -72,20 +72,29 @@ class ButtonWindow(QtGui.QMainWindow):
         self.addTabsDialog.show()
         return
 
-    def fillItem(self, item, value):
+    def fillItem(self, item, value, name = None):
+        if name != None:
+            self.tempName.append(str(name))
         item.setExpanded(False)
+        delDate = False
         if type(value) is dict:
             for key, val in sorted(value.iteritems()):
                 if type(val) is dict:
                     if 'price' in val.keys():
-                        name = key + str(np.round(np.random.rand(), 2))
+                        #name = self.tempName + ' ' + key# + str(np.round(np.random.rand(), 2))
+                        name = self._getName(key)
                         child = CustomTreeItem(name, parent = item, callbackSlot = self.outsideCallback, data = val)
                         item.addChild(child)
+                        delDate = True
                     else:
                         child = QtGui.QTreeWidgetItem()
-                        child.setText(0, unicode(key))
+                        child.setText(0, str(key))
                         item.addChild(child)
-                        self.fillItem(child, val)
+                        self.fillItem(child, val, name = str(key))
+            if delDate == True:
+                del self.tempName[2]
+                delDate = False
+
         elif type(value) is list:
             for val in value:
                 child = QtGui.QTreeWidgetItem()
@@ -101,9 +110,19 @@ class ButtonWindow(QtGui.QMainWindow):
                 child.setExpanded(True)
         return
 
-    def fillWidget(self, widget, value):
+    def _getName(self, text):
+        name = '{} {} {} {}'.format(self.tempName[2], self.tempName[0], self.tempName[1], text)
+        return name
+
+    def fillWidget(self, widget, value, name = None):
         #widget.clear()
-        self.fillItem(widget.invisibleRootItem(), value)
+        self.tempName = []
+        if name != None:
+            self.fillItem(widget.invisibleRootItem(), value, name = name)
+        else:
+            self.fillItem(widget.invisibleRootItem(), value)
+        self.tempName = ''
+        return
 
 class TabBarUI(QtGui.QTabWidget):
     def __init__(self, parent=None):
